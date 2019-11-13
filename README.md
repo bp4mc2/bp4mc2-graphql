@@ -2,10 +2,10 @@
 Mapping graphql to RDF and back. This document describes the requirements to which a Knowledge Graph GraphQL endpoint needs to comply. These requirements are made with respect to the following fundamentals:
 
 - **A Knowledge Graph endpoint should be accessible by an API user without any need to "know" Linked Data**: one of the most important reasons to use GraphQL is the acceptance of the developers community (otherwise we could just use SPARQL). Linked Data is perceived as complex and hard to understand. By hiding this complexity, we lower the bar to get started.
-- **A Knowledge Graph endpoint should only contain data that can be linked to a universal scheme, e.g.: Linked Data**: although we want to hide the RDF details, these details are very important to obtain a working and extensible knowledge graph. GraphQL schemas are by definition bound to a specific closed-world context. The universal, open-world assumption of Linked Data is needed to link different closed-world datasets together.
+- **A Knowledge Graph endpoint should only contain data that can be linked to a universal scheme, e.g.: Linked Data**: although we want to hide the RDF details, these details are very important to obtain a working and extensible knowledge graph. GraphQL schemas are by definition bound to a specific closed-world context: it requires an interface-specific schema. This therefore makes it difficult to combine GraphQL data that originates from different sources. Without the notion of globally, universal identifiers, linking between datasets is also a challenge. The universal, open-world assumption of Linked Data, with the availability of URI's for schema and data, is needed to link different closed-world datasets together.
 - **At least RDF datasets and other GraphQL endpoints should be accessible via the Knowledge Graph endpoint**: as this Knowledge Graph endpoint is all about the union of RDF and GraphQL, the actual gain is achieved when closed world GraphQL endpoints are opened by adding a RDF context, and RDF datasets are made available for developers by adding a GraphQL frontend.
 
-This requirements document is **not** about a single GraphQL endpoint that might not contain RDF data at all, but is only about GraphQL endpoints that are able to comply to a knowledge graph perspective. We are talking about a GraphQL+ endpoint: it complies to the [GraphQL specification](https://graphql.github.io/graphql-spec/), but - when you ask for more - you can get more in depth and linked data.
+This requirements document is **not** about a single GraphQL endpoint that might not contain RDF data at all, but is only about GraphQL endpoints that are able to comply to a knowledge graph perspective. We are talking about a GraphQL+ endpoint: it complies to the [GraphQL specification](https://graphql.github.io/graphql-spec/), but - when you ask for more - you can get more contextual information and linked data.
 
 For example:
 - a http request to the endpoint with accept header `application/json` would return the [usual JSON GraphQL response](https://graphql.github.io/graphql-spec/June2018/#sec-Response), serialized as JSON;
@@ -75,7 +75,7 @@ Link: <http://graphql.org/context.jsonld>; rel="http://www.w3.org/ns/json-ld#con
 }
 ```
 
-As the GraphQL specification doesn't forbid the use of this Link header, a response that complies to the GraphQL specification might include such a Link header. For a knowledge graph GraphQL endpoint, this header MUST be included when an `application/json` response is requested.
+As the GraphQL specification doesn't disallow the use of this Link header, a response that complies to the GraphQL specification might include such a Link header. For a knowledge graph GraphQL endpoint, this header MUST be included when an `application/json` response is requested.
 
 When an `application/ld+json` response is requested, the context should be part of the response body. Mark that this extends the current implementation of GraphQL, that only described a `data` and `errors` root element. It doesn't disallow other root elements, so this extension is still complies to the [GraphQL specification for responses](https://graphql.github.io/graphql-spec/June2018/#sec-Response):
 
@@ -94,7 +94,7 @@ Content-Type: application/ld+json
 }
 ```
 
-It is recommended to add the context as a reference to a seperate context document and not include the context document into response itself.
+It is recommended to add the context as a reference to a seperate context document and not include the context document into the response itself.
 
 ### 3. Content-negotiation
 
@@ -122,9 +122,9 @@ As the query itself could also include references to specific resources, the con
 
 ### 6. Map GraphQL to SPARQL query
 
-As the original dataset might be an RDF dataset, available via a SPARQL endpoint, it should be possible to map such a GraphQL query to its corresponding SPARQL counterpart. As is already proven, any GraphQL query can be transformed to a SPARQl query. All that is needed, is a mapping between the GraphQL schema and the corresponding RDF context. This means that this requirement can probably be realised with the same feature as the one that is needed for requirement R2 (and in some cases requirements R3 and R4).
+As the original dataset might be an RDF dataset, available via a SPARQL endpoint, it should be possible to map such a GraphQL query to its corresponding SPARQL counterpart. As is [already proven](https://comunica.github.io/Article-ISWC2018-Demo-GraphQlLD/), any GraphQL query can be transformed to a SPARQl query. All that is needed, is a mapping between the GraphQL schema and the corresponding RDF context. This means that this requirement can probably be realised with the same feature as the one that is needed for requirement R2 (and in some cases requirements R3 and R4).
 
-Because it is also proven that not all SPARQL queries can be transformed to a GraphQL query, it should be possible to extend the GraphQL request to obtain the same expressibility as a SPARQL query, as is specified in more detail in requirement R7.
+Because GraphQL is not as expressive as SPARQL, as [GraphQL queries represent trees](http://olafhartig.de/files/HartigPerez_WWW2018_Preprint.pdf), and not full graphs, it should be possible to extend the GraphQL request to obtain the same expressibility as a SPARQL query, as is specified in more detail in requirement R7.
 
 ### 7. Extend GraphQL
 
@@ -145,6 +145,56 @@ A GraphQL schema only has meaning within the context of that specific GraphQL sc
 ### 10. Combine results from different GraphQL schemas
 
 One of the unique features of Linked Data is the possibility to combine data from different sources. The use of universal identifiers in Linked Data vocabularies is the key capability to obtain this feature. Unfortunatelly, a GraphQL schema doesn't have this capability by itself. This requirement states that there should be some solution to fix this. For example, by using the solution for requirement R9 and use the combination of schemas as the combined schema for the combined resultset.
+
+For example, lets example the following two results from two seperate GraphQL endpoints:
+
+```
+{
+  "account": {
+    "number": "+31 555 123 45";
+  }
+}
+```
+
+```
+{
+  "account": {
+    "number": "INGB0001234567";
+  }
+}
+```
+
+A human might recognise the first account number as a telephone number, and the second account number as a bank account number, but to a machine, there are just the same: two string values, identified by the key account.number. The context of the individual GraphQL endpoint is needed to know which number is which. Fortunatelly, using http, both requests are serviced from different endpoints, so the endpoint itself can be used as the identification of context.
+
+If we want to combine these two results, we end up with one endpoint, so we need another mechanism to distinguish the two account numbers. For example, we might use one of the two solutions depicted below (not a requirement, just as an illustration what the solution might look like, other solutions might be possible as well):
+
+**Solution A: prefixing**
+```
+{
+  "tel_account": {
+    "tel_number": "+31 555 123 45";
+  }
+  "bnk_account": {
+    "bnk_number": "INGB0001234567";
+  }
+}
+```
+
+**Solution B: grouping**
+```
+{
+  "tel": {
+    "account": {
+      "number": "+31 555 123 45";
+    }
+  }
+  "bnk": {
+    "account": {
+      "number": "INGB0001234567";
+    }
+  }
+}
+```
 
 ### 11. Run-time extension
 
