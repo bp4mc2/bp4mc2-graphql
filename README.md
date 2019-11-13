@@ -1,5 +1,16 @@
 # bp4mc2-graphql
-Mapping graphql to RDF and back
+Mapping graphql to RDF and back. This document describes the requirements to which a Knowledge Graph GraphQL endpoint needs to comply. These requirements are made with respect to the following fundamentals:
+
+- **A Knowledge Graph endpoint should be accessible by an API user without any need to "know" Linked Data**: one of the most important reasons to use GraphQL is the acceptance of the developers community (otherwise we could just use SPARQL). Linked Data is perceived as complex and hard to understand. By hiding this complexity, we lower the bar to get started.
+- **A Knowledge Graph endpoint should only contain data that can be linked to a universal scheme, e.g.: Linked Data**: although we want to hide the RDF details, these details are very important to obtain a working and extensible knowledge graph. GraphQL schemas are by definition bound to a specific closed-world context. The universal, open-world assumption of Linked Data is needed to link different closed-world datasets together.
+- **At least RDF datasets and other GraphQL endpoints should be accessible via the Knowledge Graph endpoint**: as this Knowledge Graph endpoint is all about the union of RDF and GraphQL, the actual gain is achieved when closed world GraphQL endpoints are opened by adding a RDF context, and RDF datasets are made available for developers by adding a GraphQL frontend.
+
+This requirements document is **not** about a single GraphQL endpoint that might not contain RDF data at all, but is only about GraphQL endpoints that are able to comply to a knowledge graph perspective. We are talking about a GraphQL+ endpoint: it complies to the [GraphQL specification](https://graphql.github.io/graphql-spec/), but - when you ask for more - you can get more in depth and linked data.
+
+For example:
+- a http request to the endpoint with accept header `application/json` would return the [usual JSON GraphQL response](https://graphql.github.io/graphql-spec/June2018/#sec-Response), serialized as JSON;
+- a http request to the endpoint with accept header `application/ld+json` would return a contextualised GraphQL response, serialized as [JSON-LD](https://www.w3.org/TR/json-ld/);
+- a http request to the endpoint with accept header `text/turtle` would return a contextualised GraphQL response, serialized as [Turtle](https://www.w3.org/TR/turtle/).
 
 ## Resources
 
@@ -25,9 +36,9 @@ The *GraphQL querying* capability delivers a way of querying a backend based on 
 
 The *GraphQL combining* capability delivers a way of combining results from different GraphQL endpoints into one resultset. This means that the corresponding GraphQL schema should in some way be constructed from the schema's from the individual GraphQL endpoints.
 
-From these capabilities, the following requirements can be formulated:
+From these capabilities, the following requirements can be formulated. Any GraphQL endpoint that can be considered a Knowledge Graph endpoint, should at least implement requirements R1 to R5. Any Knowledge Graph endpoint that can considered a complete replacement of a SPARQL endpoint with federation features (e.g.: an endpoint that is used to combine results from different, federated datasets), should also implement requirements R6 to R11.
 
-1. It should be possible to send a regular GraphQL query (without any extensions): CAP-1;
+1. It should be possible to send a regular GraphQL query (without any extensions) over http: CAP-1;
 2. It should be possible to add a JSON-LD context to the GraphQL result: CAP-1;
 3. It should be possible to use content negotiation to obtain specific RDF serialisations (at least RDF/XML, Turtle, JSON-LD and annotated HTML): CAP-1;
 4. It should be possible to construct and deconstruct URI's in de resulting response: CAP-1;
@@ -41,11 +52,49 @@ From these capabilities, the following requirements can be formulated:
 
 ### 1. Send a regular GraphQL query
 
-It is important that a regular Joe with only knowledge about GraphQL should be able to use the GraphQL interface. This make the starting-point for first-time use as low as possible. From this first step, extensions could be added for people that need more expressibility than the regular Joe.
+It is important that a regular Joe with only knowledge about GraphQL should be able to use the GraphQL interface over http. This make the starting-point for first-time use as low as possible. From this first step, extensions could be added for people that need more expressibility than the regular Joe.
 
 ### 2. Add JSON-LD context to the GraphQL result
 
 JSON-LD is a very clever concept to enrich a plain JSON response with a semantic context. Only a `@context` element is needed, without changing the remaining part of the response. By adding a JSON-LD context, any GraphQL result magically transforms in a semantic rich Linked Data response. This context should not be hand-made. It should be possible to automatically generate the context from the configuration.
+
+A regular JSON response can be contextualised without changing the response body itself. This can be done by adding a response header to the reponse, for example:
+
+```
+HTTP/1.1 200 OK
+...
+Content-Type: application/json
+Link: <http://graphql.org/context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"
+
+{
+  data: {
+    "project": {
+      "tagline": "A query language for APIs"
+    }
+  }
+}
+```
+
+As the GraphQL specification doesn't forbid the use of this Link header, a response that complies to the GraphQL specification might include such a Link header. For a knowledge graph GraphQL endpoint, this header MUST be included when an `application/json` response is requested.
+
+When an `application/ld+json` response is requested, the context should be part of the response body. Mark that this extends the current implementation of GraphQL, that only described a `data` and `errors` root element. It doesn't disallow other root elements, so this extension is still complies to the [GraphQL specification for responses](https://graphql.github.io/graphql-spec/June2018/#sec-Response):
+
+```
+HTTP/1.1 200 OK
+...
+Content-Type: application/ld+json
+
+{
+  "@context": "http://graphql.org/context.jsonld",
+  "data": {
+    "project": {
+      "tagline": "A query language for APIs"
+    }
+  }
+}
+```
+
+It is recommended to add the context as a reference to a seperate context document and not include the context document into response itself.
 
 ### 3. Content-negotiation
 
