@@ -1,5 +1,14 @@
 # bp4mc2-graphql
-Mapping graphql to RDF and back. This document describes the requirements to which a Knowledge Graph GraphQL endpoint needs to comply. These requirements are made with respect to the following fundamentals:
+Mapping graphql to RDF and back. This document describes the requirements to which a Knowledge Graph GraphQL endpoint needs to comply.
+
+## Further reading
+
+After reading this requirements document, more detail about a reference implementation can be found in the following pages:
+- [Implementation guidelines](implementation.md)
+- [Shapes to schema mapping](shacl2graphql-schema.md)
+
+## Fundamentals
+The Knowledge graph GraphQL endpoint requirements are made with respect to the following fundamentals:
 
 - **A Knowledge Graph endpoint should be accessible by an API user without any need to "know" Linked Data**: one of the most important reasons to use GraphQL is the acceptance of the developers community (otherwise we could just use SPARQL). Linked Data is perceived as complex and hard to understand. By hiding this complexity, we lower the bar to get started.
 - **A Knowledge Graph endpoint should only contain data that can be linked to a universal scheme, e.g.: Linked Data**: although we want to hide the RDF details, these details are very important to obtain a working and extensible knowledge graph. GraphQL schemas are by definition bound to a specific closed-world context: it requires an interface-specific schema. This therefore makes it difficult to combine GraphQL data that originates from different sources. Without the notion of globally, universal identifiers, linking between datasets is also a challenge. The universal, open-world assumption of Linked Data, with the availability of URI's for schema and data, is needed to link different closed-world datasets together.
@@ -199,18 +208,3 @@ If we want to combine these two results, we end up with one endpoint, so we need
 ### 11. Run-time extension
 
 In most situations, the GraphQL schema is fixed: it will only change when a new version of the GraphQL endpoint is made available. But when we want to combine different datasets, it is very much possible that we include new datasets at run-time, which implies that the combined schema is will also change.
-
-## Implementation for the requirements
-
-Non of the currently available solutions comply to these requirements, but a clever mix of the individual features of these solutions might deliver all of the required functionality.
-
-This solution as the following features:
-
-1. A "regular" API implementation is used to handle the request/response functionality of a regular GraphQL endpoint, to implement requirement R1.
-2. Using the SHACL vocabulary, a shapes graph is created for every GraphQL endpoint that maps the RDF vocabulary to the corresponding GraphQL schema. In this way, it is even possible to generate the GraphQL schema from the shapes graph. This shapes graph can be used for the implementation of requirements R2 (context, graphQL to RDF), R6 (graphql to sparql) and R8 (RDF to graphql).
-3. Available open source RDF serialization software components are used to transform the JSON-LD resultset to specific RDF serializations, to implement requirement R3. For HTML an extendable open source component is needed, to separate content from presentation.
-4. Specific GraphQL directives are added to specify how an `@id` field is constructed for the JSON-LD URI and/or an extra functional property is constructed from the URI, to implement requirements R4 and R5.
-5. A `@sparql` directive is added to enable the construction of a SPARQl query from the GraphQL directive. The `@sparql` directive is a complex directive. It has properties as `limit` and `offset` that correspond with the specific parts of a SPARQl query. It also has a `query` property. Without this property, the SPARQL query is generated from the schema. With this property, it is possible to construct the whole query, using all the expressibility of a SPARQL query. The terms follow the GraphQL schema itself, so there is no need for knowledge about the underlying semantics.
-6. Specific GraphQL directives can be added, as specified by requirement R7. All these directives are also specified using a shapes graph and corresponding vocabulary. This mitigates the risk that the directives are only usable within the context of this specific GraphQL endpoint. By using a mapping to a RDF vocabulary, a universal directives schema is created. This vocabulary can be added to the shapes graph, so the full GraphQL schema, including directives, can be automatically generated from the shapes graph.
-7. As part of the shapes graph is a statement that states the namespace and prefix for any GraphQL schema. This statement is not part of the GraphQL schema itself, because it is needed for the combined GraphQL schema. Any term in the combined query can be contextualised using this prefix, as implementation for requirement R9 and R10.
-8. As the shapes graph can be stored in memory or into a SPARQL endpoint (or even a GraphQL endpoint, using the shapes graph for the GraphQL schema itself), the GraphQL schema can be changed at run-time.
