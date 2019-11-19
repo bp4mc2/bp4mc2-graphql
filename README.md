@@ -6,6 +6,7 @@ Mapping graphql to RDF and back. This document describes the requirements to whi
 After reading this requirements document, more detail about a reference implementation can be found in the following pages:
 - [Implementation guidelines](implementation.md)
 - [Shapes to schema mapping](shacl2graphql-schema.md)
+- [Shapes to context for jsonld mapping](graphql2jsonld.md)
 
 ## Fundamentals
 The Knowledge graph GraphQL endpoint requirements are made with respect to the following fundamentals:
