@@ -98,7 +98,7 @@ ex:FavoriteHero a sh:NodeShape;
   .
 .
 ex:Character a sh:NodeShape;
-  graphql:uriTemplate "http://example.org/id/episode/{$code}";
+  graphql:uriTemplate "http://example.org/id/character/{$name}";
   sh:property [
     graphql:name "name";
     sh:path rdfs:label;
@@ -130,7 +130,7 @@ The new directives changes the `@context` part at one place: the "appearsIn" doe
   "data": {
     "@id": "",
     "hero": {
-      "@id": "http://example.org/id/hero/R2-D2",
+      "@id": "http://example.org/id/character/R2-D2",
       "name": "R2-D2",
       "appearsIn": [
         "http://example.org/id/episode/NEWHOPE",
@@ -145,9 +145,9 @@ The new directives changes the `@context` part at one place: the "appearsIn" doe
 Resulting into the following triples:
 
 ```
-<https://example.org/graphql?query=hero> <http://example.org/def/film#hero> <http://example.org/id/hero/R2-D2> .
-<http://example.org/id/hero/R2-D2> <http://www.w3.org/2000/01/rdf-schema#label> "R2-D2" .
-<http://example.org/id/hero/R2-D2> <http://example.org/def/film#appearsIn> <http://example.org/id/episode/NEWHOPE> .
-<http://example.org/id/hero/R2-D2> <http://example.org/def/film#appearsIn> <http://example.org/id/episode/EMPIRE> .
-<http://example.org/id/hero/R2-D2> <http://example.org/def/film#appearsIn> <http://example.org/id/episode/JEDI> .
+<https://example.org/graphql?query=hero> <http://example.org/def/film#hero> <http://example.org/id/character/R2-D2> .
+<http://example.org/id/character/R2-D2> <http://www.w3.org/2000/01/rdf-schema#label> "R2-D2" .
+<http://example.org/id/character/R2-D2> <http://example.org/def/film#appearsIn> <http://example.org/id/episode/NEWHOPE> .
+<http://example.org/id/character/R2-D2> <http://example.org/def/film#appearsIn> <http://example.org/id/episode/EMPIRE> .
+<http://example.org/id/character/R2-D2> <http://example.org/def/film#appearsIn> <http://example.org/id/episode/JEDI> .
 ```
