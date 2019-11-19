@@ -419,3 +419,5 @@ ex:Character a sh:NodeShape;
   ];
 .
 ```
+
+## Linking a schema to a shapes graph
