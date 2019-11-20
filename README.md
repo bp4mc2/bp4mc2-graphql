@@ -7,6 +7,8 @@ Today, the term "Enterprise Knowledge Graph" is used for any graph-oriented solu
 
 To use GraphQL as a query language for Knowledge Graphs, we need to make it meaningful, linking it to a semantic description of the data you can query with GraphQL. This document describes the requirements to which a Knowledge Graph GraphQL endpoint needs to comply.
 
+Linked Data is a universally used approach to link things and semantically [describe data on the web](https://www.w3.org/TR/dwbp/). It is the foundation of the knowledge graph services of search engines, and the defacto approach to add [structured data](https://developers.google.com/search/docs/guides/intro-structured-data) to web pages to accommodate search engine optimalization.
+
 ## Further reading
 
 After reading this requirements document, more detail about a reference implementation can be found in the following pages:
