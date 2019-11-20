@@ -1,5 +1,11 @@
-# bp4mc2-graphql
-Mapping graphql to RDF and back. This document describes the requirements to which a Knowledge Graph GraphQL endpoint needs to comply.
+# GraphQL Semantic Knowledge Graph
+Things not strings: the knowledge graph is essentially about linking things together. The term "Knowledge Graph" is made popular by the [corresponding service provided by google](https://googleblog.blogspot.com/2012/05/introducing-knowledge-graph-things-not.html), but also companies like Microsoft, Facebook, IBM, eBay [use knowledge graphs](http://iswc2018.semanticweb.org/wp-content/uploads/2018/10/Panel-all.pdf) as part of their services.
+
+Today, the term "Enterprise Knowledge Graph" is used for any graph-oriented solution that links together things. From a data-perspective: it uses links between things to combine data from different datasets.
+
+[GraphQL](https://graphql.org) is a query language for APIs and a runtime for fulfilling those queries with your existing data. GraphQL provides a complete and understandable description of the data in your API, gives clients the power to ask for exactly what they need and nothing more, makes it easier to evolve APIs over time, and enables powerful developer tools. GraphQL is originally developed by Facebook to query their implementation of a knowledge graph.
+
+To use GraphQL as a query language for Knowledge Graphs, we need to make it meaningful, linking it to a semantic description of the data you can query with GraphQL. This document describes the requirements to which a Knowledge Graph GraphQL endpoint needs to comply.
 
 ## Further reading
 
