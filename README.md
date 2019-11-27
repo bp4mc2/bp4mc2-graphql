@@ -95,7 +95,7 @@ Link: <http://graphql.org/context.jsonld>; rel="http://www.w3.org/ns/json-ld#con
 
 As the GraphQL specification doesn't disallow the use of this Link header, a response that complies to the GraphQL specification might include such a Link header. For a knowledge graph GraphQL endpoint, this header MUST be included when an `application/json` response is requested.
 
-When an `application/ld+json` response is requested, the context should be part of the response body. Mark that this extends the current implementation of GraphQL, that only described a `data` and `errors` root element. It doesn't disallow other root elements, so this extension is still complies to the [GraphQL specification for responses](https://graphql.github.io/graphql-spec/June2018/#sec-Response):
+When an `application/ld+json` response is requested, the context should be part of the response body. Mark that as such, the result doesn't comply any more to the [GraphQL specification for responses](https://graphql.github.io/graphql-spec/June2018/#sec-Response), as this only allows a `data` and `errors` root element.
 
 ```
 HTTP/1.1 200 OK
@@ -116,13 +116,15 @@ It is recommended to add the context as a reference to a seperate context docume
 
 ### 3. Content-negotiation
 
-A very important concept of the http protocol is the content-negotation feature. With content-negotation, clients can state which data format they accept, and the server response with the corresponding format. With Linked Data, format is separated from meaning, so different formats may express the same meaning. At least the following formats should be available:
+A very important concept of the http protocol is the content-negotation feature. With content-negotation, clients can state which serialization they accept for a particular resource, and the server response with the corresponding serialization. With Linked Data, format is separated from meaning, so different serializations may be expressions of the same resource. At least the following formats should be available:
 
 - Plain JSON: as stated by requirement R1, a regular GraphQL query should be possible, so it should also be possible to deliver a regular, plain JSON result;
 - JSON-LD: as stated by requirement R2, it should be possible to add a JSON-LD context to the plain JSON result, which actually makes it a JSON-LD result;
 - RDF/XML: With the availability of a JSON-LD result, any other serialization is available (these transformations are already available). Some clients are more familiar with an XML result, and without any real costs at the server side, this should be available.
 - Turtle: As with the RDF/XML, a Turtle result is available without any real costs at the server side. As turtle is the most human-readable serialization of Linked Data, this serialization should be available.
 - Annotated HTML. Some might argue that HTML should not be in the list of result formats, but HTML is actually the most used serialization format for Linked Data, as it is used by all major search engines to crawl the web. Annotated HTML is a specific kind of HTML that encapsulated Linked Data in a HTML web page. It also gives human-friendly access to the GraphQL result. Ideally, a clear separation of content and format is used (html5, css, etc), because we really only want to have another serialization format and not heavy-load user interface features to the GraphQL capabilities.
+
+Although all these formats are serializations of the same resource, and a such comply to the [http standard](https://tools.ietf.org/html/rfc7231#section-3.4), only the Plain JSON serialization complies to the [GraphQL specification for responses](https://graphql.github.io/graphql-spec/June2018/#sec-Response). As such, only a request for a plain json response is considered a GraphQL request, all other requests are considered requests for the same resource, but in a serialization that is not dictated by the GraphQL specification, but by the mime type specification of the particular serialization.
 
 ### 4. (De)construct URI's in the response
 

@@ -199,7 +199,7 @@ GraphQL comes with a set of default scalar types out of the box:
 
 ### Custom scalar types
 
-In most GraphQL service implementations, there is a way to specify custom scalar types. Some RDF datatypes (notably xsd:date and xsd:dateTime) are not available oht of the box, so we need a way of representing these custom scalar types as "regular" RDF datatypes. For example, let's have a custom data scalar type.
+In most GraphQL service implementations, there is a way to specify custom scalar types. Some RDF datatypes (notably xsd:date and xsd:dateTime) are not available out of the box, so we need a way of representing these custom scalar types as "regular" RDF datatypes. For example, let's have a custom data scalar type.
 
 ```
 scalar Data
@@ -213,7 +213,7 @@ ex:Data a graphql:ScalarType;
 .
 ```
 
-As with Object Types, the name of the scalar type is infered from the localname, or from an explicitly specified graphql:name statement.
+As with Object Types, the name of the scalar type is inferred from the localname, or from an explicitly specified `graphql:name` statement.
 
 ### Enumeration types
 

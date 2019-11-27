@@ -73,7 +73,7 @@ From this shape, we can create the `@context`:
 - The `hero`, `name` and `appearsIn` fields are taken directly from the corresponding property shapes: the name from `graphql:name` and the URI of the corresponding property from `sh:path`.
 - The last context field is needed to state that the "data" field contains RDF data.
 
-When we add this context to the original JSON GraphQL response, we get the following triples:
+When we add this context to the original JSON GraphQL response (as part of the header, to maintain the original http body), we get the following triples:
 
 ```
 _:b0 <http://example.org/def/film#hero> _:b1 .
@@ -115,7 +115,9 @@ ex:Character a sh:NodeShape;
 
 With two `graphql:uriTemplate` statements, we can direct the converter to mint URI's. No URI template is needed for the `ex:FavoriteHero` shape. As this shape is the root of the response, it seems logical that the URI for this resource is the URL of the request itself. When this is not wanted, we might add another `graphql:uriTemplate`.
 
-The new directives changes the `@context` part at one place: the "appearsIn" doesn't have literal values any more, but URI's. The directive adds some extra statements to the GraphQL result, whenever JSON-LD is requested:
+The new directives changes the `@context` part at one place: the "appearsIn" doesn't have literal values any more, but URI's. The directive adds some extra statements to the GraphQL result, whenever JSON-LD is requested.
+
+Remember that this response is a serialization of a GraphQL request, but doesn't fully comply to the GraphQL specification as it includes a `@context` element in the root of the response and the `@id` field doesn't comply the the GraphQL specification for fieldnames: `/[_A-Za-z][_0-9A-Za-z]*/`). This could be fixed to use another name for the `@id` field (for example: `_self`) and include this field in the context as well. The context itself should be part of the header to fully comply to the GraphQL specification.
 
 ```
 {
