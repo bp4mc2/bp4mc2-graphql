@@ -420,4 +420,22 @@ ex:Character a sh:NodeShape;
 .
 ```
 
-## Linking a schema to a shapes graph
+## Linking a schema to a shape
+A GraphQL schema is an instance of the class `graphql:Schema`. By using the property `graphql:publicShape` a link is made between the schema in the shape(s) that are available in this schema. For example:
+
+```
+ex:GraphQLMySchema a graphql:Schema;
+  graphql:name "my-schema";
+  graphql:publicShape ex:Character;
+.
+```
+
+## Linking a schema to a service
+A GraphQL service itself is a [data service](https://www.w3.org/TR/vocab-dcat-2/#Class:Data_Service) as specified in the [DCAT vocabulary](https://www.w3.org/TR/vocab-dcat-2/). The `dcat:endpointURL` property is used to specify the endpoint of the GraphQL service; the `dcat:endpointDescription` property is used to link the data service to the GraphQl schema. For example:
+
+```
+ex:MyGraphQLService a dcat:DataService;
+  dcat:endpointURL <http://mydomain.org/graphql>;
+  dcat:endpointDescription ex:MyGraphQLSchema; #As specified in the previous section
+.
+```
